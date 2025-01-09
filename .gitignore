@@ -1,0 +1,15 @@
+node_modules/
+frontend/node_modules/
+*.zip
+.DS_Store
+.idea
+notes.md
+.variables.env
+.env
+backend/config/firebaseServiceAccountKey.json
+backend/config/gcs-keyfile.json
+backend/middlewares/sessionConfig.js
+backend/utils/test.json
+
+
+.codegpt

@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - nginx_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+
+  api:
+    container_name: api
+    build: .
+    restart: always
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app/src
+    environment:
+      MONGO_URL: "mongodb+srv://phslucky:2SyMkjpsaicV2fJl@kaamhai-main-database-a.8isjdhg.mongodb.net/kaamhai"
+    networks:
+      - nginx_network
+
+  # frontend:
+  #   container_name: frontend
+  #   build:
+  #     context: ./admin-panel
+  #     target: dev
+  #   restart: always
+  #   command: npm run dev
+  #   environment:
+  #     - NODE_ENV=development 
+  #     - MONGO_URL="mongodb://mongo:27017/kaamhai-admin"
+  #   volumes:
+  #     - ./admin-panel:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   ports:
+  #     - 3000:3000
+  #   networks:
+  #     - nginx_network
+  #   depends_on:
+  #     mongo:
+  #       condition: service_healthy
+
+  # nginx:
+  #   image: nginx
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/server.conf:/etc/nginx/conf.d/default.conf
+  #     - ./nginx/kaamhaicore.app.nityom.cloud.crt:/etc/ssl/kaamhaicore.app.nityom.cloud.crt
+  #     - ./nginx/kaamhaicore.app.nityom.cloud.key:/etc/ssl/kaamhaicore.app.nityom.cloud.key
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - nginx_network
+
+networks:
+  nginx_network:
+    driver: bridge
+
+volumes:
+  mongo-data:
